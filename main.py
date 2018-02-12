@@ -16,23 +16,32 @@ def send(to, body, subject='Shambles Audition'):
     msg = """\From: %s\nTo: %s\nSubject: %s\n%s\n""" % (fromaddr, to, subject, body)
     server.sendmail(fromaddr, to, msg)
 
+def getFname(person):
+    return person[NAME].partition(' ')[0]
+
 def sendAccept(person):
-    fname = person[NAME].partition(' ')[0]
+    fname = getFname(person)
     send(person[EMAIL], acceptMsg.format(fname))
 
 def sendReject(person):
-    fname = person[NAME].partition(' ')[0]
+    fname = getFname(person)
     send(person[EMAIL], rejectMsg.format(fname))
+
+def sendCallback(person):
+    fname = getFname(person)
+    send(person[EMAIL], callbackMsg.format(fname))
 
 with open('config.yaml') as f:
     cfg = yaml.load(f)
-
 
 with open('accept.txt') as f:
     acceptMsg = f.read()
 
 with open('reject.txt') as f:
     rejectMsg = f.read()
+
+with open('callback.txt') as f:
+    callbackMsg = f.read()
 
 data = []
 with open('data.csv') as f:
@@ -41,8 +50,6 @@ with open('data.csv') as f:
         data.append(row)
 
 del data[0]
-
-print (data)
 
 fromaddr = cfg['username']
 
@@ -60,9 +67,13 @@ login()
 for person in data:
     if person[ACCEPT] == 'Y':
         sendAccept(person)
+        print ('Acceptance sent to {0}'.format(person[NAME]))
     elif person[ACCEPT] == 'N':
         sendReject(person)
+        print ('Rejection sent to {0}'.format(person[NAME]))
+    elif person[ACCEPT] == 'C':
+        sendCallback(person)
+        print ('Callback sent to {0}'.format(person[NAME]))
     else:
         raise AcceptTokenNotRecognisedException
-    print ('Email sent! to {0}'.format(person[NAME]))
 wrapup()
