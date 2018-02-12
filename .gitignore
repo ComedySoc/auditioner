@@ -1,4 +1,8 @@
 config.yaml
+accept.txt
+reject.txt
+callback.txt
+data.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
